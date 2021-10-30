@@ -169,6 +169,7 @@ delete obj.key1;
 console.log(obj); // => { "key2": "value2" }
 
 
+
 // [コラム] constで定義したオブジェクトは変更可能
 
 const obj = { key: "value" };
@@ -189,3 +190,170 @@ object.key = "value"; // => TypeError: "key" is read-only
 
 
 
+// プロパティの存在を確認する
+
+// JavaScriptでは、存在しないプロパティに対してアクセスした場合に例外ではなくundefinedを返します。
+const obj = {};
+console.log(obj.notFound); // => undefined
+
+const widget = {
+  window: {
+      title: "ウィジェットのタイトル"
+  }
+};
+// `window`を`windw`と間違えているが、例外は発生しない
+console.log(widget.windw); // => undefined
+// さらにネストした場合に、例外が発生する
+// `undefined.title`と書いたのと同じ意味となるため
+console.log(widget.windw.title); // => TypeError: widget.windw is undefined
+// 例外が発生した文以降は実行されません
+
+
+
+// あるオブジェクトがあるプロパティを持っているかを確認する方法
+// ・undefinedとの比較
+// ・in演算子
+// ・hasOwnPropertyメソッド
+
+
+// プロパティの存在確認: undefinedとの比較
+const obj = {
+  key: "value"
+};
+// `key`プロパティが`undefined`ではないなら、プロパティが存在する?
+if (obj.key !== undefined) {
+  // `key`プロパティが存在する?ときの処理
+  console.log("`key`プロパティの値は`undefined`ではない");
+}
+
+// この方法はプロパティの値がundefinedであった場合に、
+// プロパティそのものが存在するかを区別できないという問題があります。
+const obj = {
+  key: undefined
+};
+// `key`プロパティの値が`undefined`である場合
+if (obj.key !== undefined) {
+  // この行は実行されません
+}
+
+
+// プロパティの存在確認: in演算子を使う
+"プロパティ名" in オブジェクト; // true or false
+// in演算子は、プロパティの値は関係なく、プロパティが存在した場合にtrueを返します。
+
+const obj = { key: undefined };
+// `key`プロパティを持っているならtrue
+if ("key" in obj) {
+    console.log("`key`プロパティは存在する");
+}
+
+
+// プロパティの存在確認: hasOwnPropertyメソッド
+// オブジェクト自身が指定したプロパティを持っているかを判定できます。
+const obj = {};
+obj.hasOwnProperty("プロパティ名"); // true or false
+
+const obj = { key: "value" };
+// `obj`が`key`プロパティを持っているならtrue
+if (obj.hasOwnProperty("key")) {
+    console.log("`object`は`key`プロパティを持っている");
+}
+
+// in演算子とhasOwnPropertyメソッドは同じ結果を返していますが、厳密には動作が異なるケースもあります。
+// 次の章の「プロトタイプオブジェクト」で詳しく解説
+
+
+
+// [ES2020] Optional chaining演算子（?.）
+
+// 次のコードでは、widget.window.titleプロパティにアクセスできるなら、
+// そのプロパティの値をコンソールに表示しています。
+function printWidgetTitle(widget) {
+  // 例外を避けるために`widget`のプロパティの存在を順番に確認してから、値を表示している
+  if (widget.window !== undefined && widget.window.title !== undefined) {
+      console.log(`ウィジェットのタイトルは${widget.window.title}です`);
+  } else {
+      console.log("ウィジェットのタイトルは未定義です");
+  }
+}
+// タイトルが定義されているwidget
+printWidgetTitle({
+  window: {
+      title: "Book Viewer"
+  }
+}); // => ウィジェットのタイトルはBook Viewerです
+// タイトルが未定義のwidget
+printWidgetTitle({
+  // タイトルが定義されてない空のオブジェクト
+}); // => ウィジェットのタイトルは未定義です
+
+// ネストしたプロパティにアクセスする際には、プロパティの存在を順番に確認してからアクセスする必要がある
+// プロパティへアクセスするたびにundefinedとの比較をAND演算子（&&）でつなげて書いていくと冗長
+
+
+// Optional chaining演算子（?.）
+// 左辺のオペランドがnullish（nullまたはundefined）の場合は、それ以上評価せずにundefinedを返します。
+// 一方で、プロパティが存在する場合は、そのプロパティの評価結果を返します。
+
+const obj = {
+  a: {
+      b: "objのaプロパティのbプロパティ"
+  }
+};
+// obj.a.b は存在するので、その評価結果を返す
+console.log(obj?.a?.b); // => "objのaプロパティのbプロパティ"
+// 存在しないプロパティのネストも`undefined`を返す
+// ドット記法の場合は例外が発生してしまう
+console.log(obj?.notFound?.notFound); // => undefined
+// undefinedやnullはnullishなので、`undefined`を返す
+console.log(undefined?.notFound?.notFound); // => undefined
+console.log(null?.notFound?.notFound); // => undefined
+
+
+// 先のウィジェットのタイトルを表示する関数を?.を使って書き換え
+function printWidgetTitle(widget) {
+  const title = widget?.window?.title ?? "未定義";
+  console.log(`ウィジェットのタイトルは${title}です`);
+}
+printWidgetTitle({
+  window: {
+      title: "Book Viewer"
+  }
+}); // "ウィジェットのタイトルはBook Viewerです" と出力される
+printWidgetTitle({
+  // タイトルが定義されてない空のオブジェクト
+}); // "ウィジェットのタイトルは未定義です" と出力される
+
+
+// Optional chaining演算子（?.）はブラケット記法（[]）と組み合わせることもできます。
+const languages = {
+  ja: {
+      hello: "こんにちは！"
+  },
+  en: {
+      hello: "Hello!"
+  }
+};
+const langJapanese = "ja";
+const langKorean = "ko";
+const messageKey = "hello";
+// Optional chaining演算子（`?.`）とブラケット記法を組みわせた書き方
+console.log(languages?.[langJapanese]?.[messageKey]); // => "こんにちは！"
+// `languages`に`ko`プロパティが定義されていないため、`undefined`を返す
+console.log(languages?.[langKorean]?.[messageKey]); // => undefined
+
+
+
+// オブジェクトのtoStringメソッド
+const obj = { key: "value" };
+console.log(obj.toString()); // => "[object Object]"
+// `String`コンストラクタ関数は`toString`メソッドを呼んでいる
+console.log(String(obj)); // => "[object Object]"
+
+// 独自のtoStringメソッドを定義
+const customObject = {
+  toString() {
+      return "custom value";
+  }
+};
+console.log(String(customObject)); // => "custom value"
