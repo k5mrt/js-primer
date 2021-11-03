@@ -357,3 +357,177 @@ const customObject = {
   }
 };
 console.log(String(customObject)); // => "custom value"
+
+
+
+// [コラム] オブジェクトのプロパティ名は文字列として扱われる
+
+const obj = {};
+const keyObject1 = { a: 1 };
+const keyObject2 = { b: 2 };
+// どちらも同じプロパティ名（"[object Object]"）に代入している
+obj[keyObject1] = "1";
+obj[keyObject2] = "2";
+console.log(obj); //  { "[object Object]": "2" }
+
+
+// Symbolは文字列化されずにオブジェクトのプロパティ名として扱える
+
+const obj = {};
+// Symbolは例外的に文字列化されず扱える
+const symbolKey1 = Symbol("シンボル1");
+const symbolKey2 = Symbol("シンボル2");
+obj[symbolKey1] = "1";
+obj[symbolKey2] = "2";
+console.log(obj[symbolKey1]); // => "1"
+console.log(obj[symbolKey2]); // => "2"
+
+
+
+// オブジェクトの静的メソッド(スタティックメソッド)
+
+// オブジェクトの列挙
+const obj = {
+  "one": 1,
+  "two": 2,
+  "three": 3
+};
+// `Object.keys`はキーを列挙した配列を返す
+console.log(Object.keys(obj)); // => ["one", "two", "three"]
+// `Object.values`は値を列挙した配列を返す
+console.log(Object.values(obj)); // => [1, 2, 3]
+// `Object.entries`は[キー, 値]の配列を返す
+console.log(Object.entries(obj)); // => [["one", 1], ["two", 2], ["three", 3]]
+
+// forEachなどと組み合わせれば反復処理ができる
+const obj = {
+  "one": 1,
+  "two": 2,
+  "three": 3
+};
+const keys = Object.keys(obj);
+keys.forEach(key => {
+  console.log(key);
+});
+// 次の値が順番に出力される
+// "one"
+// "two"
+// "three"
+
+
+// オブジェクトのマージと複製
+// Object.assignメソッド[ES2015]
+// sourcesオブジェクト自身が持つ列挙可能なプロパティを,
+// 第一引数のtargetオブジェクトに対してコピー
+// 返り値は、targetオブジェクトになります
+const obj = Object.assign(target, ...sources);
+
+// マージ
+const objectA = { a: "a" };
+const objectB = { b: "b" };
+const merged = Object.assign({}, objectA, objectB);
+console.log(merged); // => { a: "a", b: "b" }
+
+// 第一引数に既存のオブジェクトも指定可
+// 指定したオブジェクトのプロパティが変更されます
+const objectA = { a: "a" };
+const objectB = { b: "b" };
+const merged = Object.assign(objectA, objectB);
+console.log(merged); // => { a: "a", b: "b" }
+// `objectA`が変更されている
+console.log(objectA); // => { a: "a", b: "b" }
+console.log(merged === objectA); // => true
+
+// 空のオブジェクトをtargetにすることで、
+// 既存のオブジェクトには影響を与えずマージしたオブジェクトを作ることができます
+// そのため、Object.assignメソッドの第一引数には、
+// 空のオブジェクトリテラルを指定するのが典型的
+
+// プロパティ名が重複した場合は、後ろのオブジェクトのプロパティにより上書きされます
+
+// `version`のプロパティ名が被っている
+const objectA = { version: "a" };
+const objectB = { version: "b" };
+const merged = Object.assign({}, objectA, objectB);
+// 後ろにある`objectB`のプロパティで上書きされる
+console.log(merged); // => { version: "b" }
+
+
+// [ES2018] オブジェクトのspread構文でのマージ
+// オブジェクトのspread構文は、
+// オブジェクトリテラルの中に指定したオブジェクトのプロパティを展開できます
+const objectA = { a: "a" };
+const objectB = { b: "b" };
+const merged = {
+    ...objectA,
+    ...objectB
+};
+console.log(merged); // => { a: "a", b: "b" }
+
+// プロパティ名が被った場合の優先順位は、後ろにあるオブジェクトが優先されます
+// `version`のプロパティ名が被っている
+const objectA = { version: "a" };
+const objectB = { version: "b" };
+const merged = {
+    ...objectA,
+    ...objectB,
+    other: "other"
+};
+// 後ろにある`objectB`のプロパティで上書きされる
+console.log(merged); // => { version: "b", other: "other" }
+
+
+// オブジェクトの複製
+// jsにはオブジェクト複製の関数はない
+// 新たに空のオブジェクトを作り、そこへコピー
+// 引数の`obj`を浅く複製したオブジェクトを返す
+const shallowClone = (obj) => {
+  return Object.assign({}, obj);
+};
+const obj = { a: "a" };
+const cloneObj = shallowClone(obj);
+console.log(cloneObj); // => { a: "a" }
+// オブジェクトを複製しているので、異なるオブジェクトとなる
+console.log(obj === cloneObj); // => false
+
+
+// 注意：Object.assignメソッドはsourcesオブジェクトのプロパティを浅くコピー（shallow copy）する
+// shallow copyとは、sourcesオブジェクトの直下にあるプロパティだけをコピーすること
+const shallowClone = (obj) => {
+  return Object.assign({}, obj);
+};
+const obj = {
+  level: 1,
+  nest: {
+      level: 2
+  },
+};
+const cloneObj = shallowClone(obj);
+// `nest`プロパティのオブジェクトは同じオブジェクトのままになる 
+console.log(cloneObj.nest === obj.nest); // => true
+
+
+// プロパティの値までも再帰的に複製してコピーすることを、深いコピー（deep copy）
+// deep copyは、再帰的にshallow copyする
+// 引数の`obj`を浅く複製したオブジェクトを返す
+const shallowClone = (obj) => {
+  return Object.assign({}, obj);
+};
+// 引数の`obj`を深く複製したオブジェクトを返す
+function deepClone(obj) {
+  const newObj = shallowClone(obj);
+  // プロパティがオブジェクト型であるなら、再帰的に複製する
+  Object.keys(newObj)
+      .filter(k => typeof newObj[k] === "object")
+      .forEach(k => newObj[k] = deepClone(newObj[k]));
+  return newObj;
+}
+const obj = {
+  level: 1,
+  nest: {
+      level: 2
+  }
+};
+const cloneObj = deepClone(obj);
+// `nest`オブジェクトも再帰的に複製されている
+console.log(cloneObj.nest === obj.nest); // => false
