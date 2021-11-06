@@ -214,3 +214,306 @@ console.log(isIncludedBlueColor); // => true
 
 
 // 追加と削除
+
+// 末尾へ追加するにはArray#push
+// 末尾から要素を削除するにはArray#pop
+const array = ["A", "B", "C"];
+array.push("D"); // "D"を末尾に追加
+console.log(array); // => ["A", "B", "C", "D"]
+const poppedItem = array.pop(); // 最末尾の要素を削除し、その要素を返す
+console.log(poppedItem); // => "D"
+console.log(array); // => ["A", "B", "C"]
+
+// 先頭へ追加するにはArray#unshift
+// 先頭から要素を削除するにはArray#shift
+const array = ["A", "B", "C"];
+array.unshift("S"); // "S"を先頭に追加
+console.log(array); // => ["S", "A", "B", "C"]
+const shiftedItem = array.shift(); // 先頭の要素を削除
+console.log(shiftedItem); // => "S"
+console.log(array); // => ["A", "B", "C"]
+
+
+
+// 配列同士を結合
+// Array#concatメソッド
+const array = ["A", "B", "C"];
+const newArray = array.concat(["D", "E"]);
+console.log(newArray); // => ["A", "B", "C", "D", "E"]
+
+// concatメソッドは配列だけではなく任意の値を要素として結合できます
+const array = ["A", "B", "C"];
+const newArray = array.concat("新しい要素");
+console.log(newArray); // => ["A", "B", "C", "新しい要素"]
+
+
+
+// [ES2015] 配列の展開
+// ...（Spread構文）
+// を使うことで、配列リテラル中に既存の配列を展開できます
+
+// 次のコードでは、配列リテラルの末尾に配列を展開しています
+// これは、Array#concatメソッドで配列同士を結合するのと同じ結果になります
+const array = ["A", "B", "C"];
+// Spread構文を使った場合
+const newArray = ["X", "Y", "Z", ...array];
+// concatメソッドの場合
+const newArrayConcat = ["X", "Y", "Z"].concat(array);
+console.log(newArray); // => ["X", "Y", "Z", "A", "B", "C"]
+console.log(newArrayConcat); // => ["X", "Y", "Z", "A", "B", "C"]
+
+// Spread構文は、concatメソッドとは異なり、
+// 配列リテラル中の任意の位置に配列を展開できます
+const array = ["A", "B", "C"];
+const newArray = ["X", ...array, "Z"];
+console.log(newArray); // => ["X", "A", "B", "C", "Z"]
+
+
+
+// [ES2019] 配列をフラット化
+// Array#flatメソッド[ES2019]を使うことで、多次元配列をフラットな配列に変換できます
+// 引数を指定しなかった場合は1段階のみのフラット化ですが、
+// 引数に渡す数値でフラット化する深さを指定できます
+// 配列をすべてフラット化する場合には、無限を意味するInfinityを値として渡すことで実現
+//
+const array = [[["A"], "B"], "C"];
+// 引数なしは 1 を指定した場合と同じ
+console.log(array.flat()); // => [["A"], "B", "C"]
+console.log(array.flat(1)); // => [["A"], "B", "C"]
+console.log(array.flat(2)); // => ["A", "B", "C"]
+// すべてをフラット化するには Infinity を渡す
+console.log(array.flat(Infinity)); // => ["A", "B", "C"]
+
+// Array#flatメソッドは必ず新しい配列を作成して返すメソッド
+// そのため、これ以上フラット化できない配列をフラット化しても、
+// 同じ要素を持つ新しい配列を返します
+const array = ["A", "B", "C"];
+console.log(array.flat()); // => ["A", "B", "C"]
+
+
+
+// 配列から要素を削除
+
+// 配列の任意のインデックスの要素を削除するには
+// Array#splice
+// Array#spliceメソッドを利用すると、削除した要素を自動で詰めることができます
+// Array#spliceメソッドは指定したインデックスから、指定した数だけ要素を取り除き、
+// 必要ならば要素を同時に追加できます
+//
+const array = [];
+array.splice(インデックス, 削除する要素数);
+// 削除と同時に要素の追加もできる
+array.splice(インデックス, 削除する要素数, ...追加する要素);
+
+// 配列のインデックスが1の要素を削除するには、
+//インデックス1から1つの要素を削除するという指定をする必要があります
+//このとき、削除した要素は自動で詰められるため、疎な配列にはなりません
+//
+const array = ["a", "b", "c"];
+// 1番目から1つの要素("b")を削除
+array.splice(1, 1);
+console.log(array); // => ["a", "c"]
+console.log(array.length); // => 2
+console.log(array[1]); // => "c"
+// すべて削除
+array.splice(0, array.length);
+console.log(array.length); // => 0
+
+
+// lengthプロパティへの代入
+// 配列のすべての要素を削除することはArray#spliceで行えますが、 
+// 配列のlengthプロパティへの代入を利用した方法もあります
+//
+const array = [1, 2, 3];
+array.length = 0; // 配列を空にする
+console.log(array); // => []
+//
+// 配列のlengthプロパティへ要素数を代入すると、その要素数に配列が切り詰められます
+// つまり、lengthプロパティへ0を代入すると、インデックスが0以降の要素がすべて削除されます
+
+
+// 空の配列を代入
+// その配列の要素を削除するのではなく、新しい空の配列を変数へ代入する方法
+//
+let array = [1, 2, 3];
+console.log(array.length); // => 3
+// 新しい配列で変数を上書き
+array = [];
+console.log(array.length); // => 0
+
+// constで宣言した配列の場合は変数に対して再代入できないため、この手法は使えません
+const array = [1, 2, 3];
+console.log(array.length); // => 3
+// `const`で宣言された変数には再代入できない
+array = []; // TypeError: invalid assignment to const `array' が発生
+
+
+
+// 破壊的なメソッドと非破壊的なメソッド
+// 破壊的なメソッド:
+// 配列オブジェクトそのものを変更し、変更した配列または変更箇所を返すメソッド
+// 非破壊的メソッド:
+// 配列オブジェクトのコピーを作成してから変更し、そのコピーした配列を返すメソッド
+
+// 破壊的なメソッドの例:
+// 配列に要素を追加するArray#pushメソッド
+// pushメソッドは、myArrayの配列そのものへ要素を追加しています
+// その結果myArray変数の参照する配列が変更される
+//
+const myArray = ["A", "B", "C"];
+const result = myArray.push("D");
+// `push`の返り値は配列ではなく、追加後の配列のlength
+console.log(result); // => 4
+// `myArray`が参照する配列そのものが変更されている
+console.log(myArray); // => ["A", "B", "C", "D"]
+
+// 非破壊的なメソッドの例:
+// 配列に要素を結合するArray#concatメソッド
+// myArray変数の参照する配列は変更されない
+//
+const myArray = ["A", "B", "C"];
+// `concat`の返り値は結合済みの新しい配列
+const newArray = myArray.concat("D");
+console.log(newArray); // => ["A", "B", "C", "D"]
+// `myArray`は変更されていない
+console.log(myArray); // => ["A", "B", "C"]
+// `newArray`と`myArray`は異なる配列オブジェクト
+console.log(myArray === newArray); // => false
+
+
+// JavaScriptにおいて破壊的なメソッドと非破壊的メソッドを名前から見分ける方法はありません
+// 破壊的であることについてのコメントがあると親切
+
+// 関数を非破壊的なものにするには、受け取った配列をコピーしてから変更を加える必要があります
+
+// 配列をコピーする方法としてArray#sliceメソッドとArray#concatメソッド
+// 引数なしで呼び出すと、その配列のコピーを返します
+//
+const myArray = ["A", "B", "C"];
+// `slice`は`myArray`のコピーを返す - `myArray.concat()`でも同じ
+const copiedArray = myArray.slice();
+myArray.push("D");
+console.log(myArray); // => ["A", "B", "C", "D"]
+// `array`のコピーである`copiedArray`には影響がない
+console.log(copiedArray); // => ["A", "B", "C"]
+// コピーであるため参照は異なる
+console.log(copiedArray === myArray); // => false
+
+
+
+// 配列を反復処理するメソッド
+
+// Array#forEach
+// 配列の要素を先頭から順番にコールバック関数へ渡し、反復処理を行う
+const array = [1, 2, 3];
+array.forEach((currentValue, index, array) => {
+    console.log(currentValue, index, array);
+});
+// コンソールの出力
+// 1, 0, [1, 2, 3]
+// 2, 1, [1, 2, 3]
+// 3, 2, [1, 2, 3]
+
+
+//Array#map
+// 配列の要素を順番にコールバック関数へ渡し、
+// コールバック関数が返した値から新しい配列を返す非破壊的なメソッド
+// 配列の各要素を加工したい場合に利用
+// 返り値は、それぞれのコールバック関数が返した値を集めた新しい配列
+//
+const array = [1, 2, 3];
+// 各要素に10を乗算した新しい配列を作成する
+const newArray = array.map((currentValue, index, array) => {
+    return currentValue * 10;
+});
+console.log(newArray); // => [10, 20, 30]
+// 元の配列とは異なるインスタンス
+console.log(array === newArray); // => false
+
+
+// Array#filter
+// コールバック関数がtrueを返した要素だけを集めた新しい配列を返す非破壊的なメソッド
+// 配列から不要な要素を取り除いた配列を作成したい場合に利用
+// 返り値は、コールバック関数がtrueを返した要素だけを集めた新しい配列
+//
+const array = [1, 2, 3];
+// 奇数の値を持つ要素だけを集めた配列を返す
+const newArray = array.filter((currentValue, index, array) => {
+    return currentValue % 2 === 1;
+});
+console.log(newArray); // => [1, 3]
+// 元の配列とは異なるインスタンス
+console.log(array === newArray); // => false
+
+
+// Array#reduce
+// 累積値（アキュムレータ）と配列の要素を順番にコールバック関数へ渡し、1つの累積値を返します
+// 配列から配列以外を含む任意の値を作成したい場合に利用
+// コールバック関数の引数:
+// 累積値, 要素, インデックス, 配列
+// reduceメソッドの第二引数: 累積値の初期値となる値を渡せます
+
+// reduceメソッドは初期値を0として配列の各要素を加算した1つの数値を返します。 
+// つまり配列から配列要素の合計値というNumber型の値を返しています。
+//
+const array = [1, 2, 3];
+// すべての要素を加算した値を返す
+// accumulatorの初期値は`0`
+const totalValue = array.reduce((accumulator, currentValue, index, array) => {
+    return accumulator + currentValue;
+}, 0);
+// 0 + 1 + 2 + 3という式の結果が返り値になる
+console.log(totalValue); // => 6
+
+
+
+// [コラム] Array-likeオブジェクト
+// 配列のように扱えるが配列ではないオブジェクト
+
+// Array-likeオブジェクトの例としてargumentsがあります
+// functionで宣言した関数の中から参照できる変数
+// 引数に渡された値が順番に格納されていて、配列のように引数へアクセスできます
+//
+function myFunc() {
+  console.log(arguments[0]); // => "a"
+  console.log(arguments[1]); // => "b"
+  console.log(arguments[2]); // => "c"
+  // 配列ではないため、配列のメソッドは持っていない
+  console.log(typeof arguments.forEach); // => "undefined"
+}
+myFunc("a", "b", "c");
+
+
+// Array-likeオブジェクトか配列なのかを判別するにはArray.isArrayメソッドを利用
+function myFunc() {
+  console.log(Array.isArray([1, 2, 3])); // => true
+  console.log(Array.isArray(arguments)); // => false
+}
+myFunc("a", "b", "c");
+
+
+// Array.fromメソッド[ES2015]を使うことでArray-likeオブジェクトを配列に変換して扱うことができます
+function myFunc() {
+  // Array-likeオブジェクトを配列へ変換
+  const argumentsArray = Array.from(arguments);
+  console.log(Array.isArray(argumentsArray)); // => true
+  // 配列のメソッドを利用できる
+  argumentsArray.forEach(arg => {
+      console.log(arg);
+  });
+}
+myFunc("a", "b", "c");
+
+
+
+// メソッドチェーンと高階関数
+// メソッドを呼び出した返り値に対してメソッド呼び出しをするパターン
+
+// 次のコードでは、
+// Array#concatメソッドの返り値、つまり配列に対して
+// さらにconcatメソッドを呼び出す
+// というメソッドチェーンが行われています
+const array = ["a"].concat("b").concat("c");
+console.log(array); // => ["a", "b", "c"]
+
+// メソッドチェーンを利用することで処理の見た目を簡潔にできます
